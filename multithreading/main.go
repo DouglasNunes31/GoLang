@@ -79,7 +79,7 @@ func BuscaDadosApi(url string, res RetornoApi) error {
 	}
 	err = json.Unmarshal(body, res)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Erro ao fazer o parse da resposta %v\n", err)
+		fmt.Fprintf(os.Stderr, "Erro ao fazer o parse da resposta* %v\n", err)
 	}
 	return nil
 
