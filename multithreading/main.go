@@ -11,15 +11,13 @@ import (
 
 type RetornoApi interface{}
 
-type ApiCEP struct {
-	Code       string `json:"code"`
-	State      string `json:"state"`
-	City       string `json:"city"`
-	District   string `json:"district"`
-	Address    string `json:"address"`
-	Status     int    `json:"status"`
-	Ok         bool   `json:"ok"`
-	StatusText string `json:"statusText"`
+type Brasilapi struct {
+	Code         string `json:"cep"`
+	State        string `json:"state"`
+	City         string `json:"city"`
+	Neighborhood string `json:"neighborhood"`
+	Street       string `json:"street"`
+	Service      string `json:"service"`
 }
 type ViaCEP struct {
 	Cep         string `json:"cep"`
@@ -35,15 +33,15 @@ type ViaCEP struct {
 }
 
 func main() {
-	chApiCEP := make(chan ApiCEP)
+	chBrasilapi := make(chan Brasilapi)
 	chViaCEP := make(chan ViaCEP)
 
-	go BuscaApiCEP(chApiCEP)
+	go BuscaBrasilapi(chBrasilapi)
 	go BuscaViaCEP(chViaCEP)
 
 	select {
-	//case retornoApiCEP := <-chApiCEP:
-	//		fmt.Printf("brasilapi: ", retornoApiCEP)
+	case retornoBrasilapi := <-chBrasilapi:
+		fmt.Printf("brasilapi: ", retornoBrasilapi)
 
 	case retornoViaCEP := <-chViaCEP:
 		fmt.Printf("ViaCEP: ", retornoViaCEP)
@@ -61,10 +59,10 @@ func BuscaViaCEP(chBuscaViaCep chan ViaCEP) {
 	chBuscaViaCep <- viaCEP
 }
 
-func BuscaApiCEP(chBuscaApiCep chan ApiCEP) {
-	var apiCEP ApiCEP
-	BuscaDadosApi("https://brasilapi.com.br/api/cep/v1/01153000.json", &apiCEP)
-	chBuscaApiCep <- apiCEP
+func BuscaBrasilapi(chBrasilapi chan Brasilapi) {
+	var brassilAPI Brasilapi
+	BuscaDadosApi("https://brasilapi.com.br/api/cep/v2/89010025.json", &brassilAPI)
+	chBrasilapi <- brassilAPI
 }
 
 func BuscaDadosApi(url string, res RetornoApi) error {
@@ -79,7 +77,7 @@ func BuscaDadosApi(url string, res RetornoApi) error {
 	}
 	err = json.Unmarshal(body, res)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Erro ao fazer o parse da resposta* %v\n", err)
+		fmt.Fprintf(os.Stderr, "Erro ao fazer o parse da resposta %v\n", err)
 	}
 	return nil
 
